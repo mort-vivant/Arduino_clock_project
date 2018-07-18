@@ -16,6 +16,16 @@
 #define HUR_PIN 5  // Define Hours adjust button pin
 #define BRI_PIN A3  // Define Light sensor pin
 
+#define auto_bright 1        // автоматическая подстройка яркости от уровня внешнего освещения (1 - включить, 0 - выключить)
+#define max_bright 50       // максимальная яркость (0 - 255)
+#define min_bright 1        // минимальная яркость (0 - 255)
+#define bright_constant 500  // константа усиления от внешнего света (0 - 1023)
+// чем МЕНЬШЕ константа, тем "резче" будет прибавляться яркость
+#define coef 0.9             // коэффициент фильтра (0.0 - 1.0), чем больше - тем медленнее меняется яркость
+
+int new_bright, new_bright_f;
+unsigned long bright_timer, off_timer;
+
 CRGB leds[NUM_LEDS]; // Define LEDs strip
                     // 0,0,0,0
                     // 1,1,1,1
@@ -90,26 +100,17 @@ int GetTime(){
 // Check Light sensor and set brightness accordingly
 void BrightnessCheck(){
  
- // const byte sensorPin = BRI_PIN;
- // int sensorValue = analogRead(sensorPin);
- // sensorValue = map(sensorValue, 0, 1023, 50, 1);
- // int brightness = 50 -  sensorValue; 
- // Serial.print("Sensor is: ");Serial.println(sensorValue);
- // LEDS.setBrightness(brightness);
- 
+  if (auto_bright) {                         // если включена адаптивная яркость
+    if (millis() - bright_timer > 100) {     // каждые 100 мс
+      bright_timer = millis();               // сброить таймер
+      new_bright = map(analogRead(BRI_PIN), 0, bright_constant, min_bright, max_bright);   // считать показания с фоторезистора, перевести диапазон
+      new_bright = constrain(new_bright, min_bright, max_bright);
+      new_bright_f = new_bright_f * coef + new_bright * (1 - coef);
+      LEDS.setBrightness(new_bright_f);      // установить новую яркость
+    }
+   }
+ };
   
-  const byte sensorPin = BRI_PIN; // light sensor pin
-  const byte brightnessLow = 2; // Low brightness value
-  const byte brightnessMid = 20; // Mid brightness value
-  const byte brightnessHigh = 50; // High brightness value
-  int sensorValue = analogRead(sensorPin); // Read sensor
-  sensorValue = map(sensorValue, 0, 1023, 0, 100);
-  Serial.print("Sensor is: ");Serial.println(sensorValue);
-  LEDS.setBrightness(sensorValue);
-   if (sensorValue >= 75) {LEDS.setBrightness(brightnessHigh);}
-   else if (sensorValue < 75 && sensorValue >= 35) {LEDS.setBrightness(brightnessMid);}
-   else {LEDS.setBrightness(brightnessLow);}  
-  };
   
 // Convert time to array needet for display 
 void TimeToArray(){
@@ -347,5 +348,3 @@ void loop()  // Main loop
   FastLED.show(); // Display leds array
   if (TempShow == true) delay (8000);
 }
-
-
