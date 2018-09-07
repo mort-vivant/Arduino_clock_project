@@ -4,6 +4,7 @@
 ### Things used for this project :
 * Arduino nano V3.0
 * DS3231 RTC module
+* DHT11 Sensor
 * WS2812B led strip 60 leds/m  2m
 * Pushbutton switches 3 PCS
 * 10k Ohm resistor
