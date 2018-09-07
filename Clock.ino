@@ -4,14 +4,14 @@
 #include <Wire.h>
 #include "FastLED.h"
 #include "DHT.h"
-#define DHT_PIN 3             // пин подключения датчика DHT 11 
+#define DHT_PIN 5             // пин подключения датчика DHT 11 
 #define DHTTYPE DHT11         // DHT 11 
 #define NUM_LEDS 114          // 4*7*4 +2  количество светодиодов в ленте
 #define COLOR_ORDER BRG       // определение порядка цветов для ленты
 #define DATA_PIN 6            // пин подключения ленты
 #define DST_PIN 2             // пин кнопки перевода на летнее время и обратно
-#define MIN_PIN 4             // пин кнопки настройки минут
-#define HUR_PIN 5             // пин кнопки настройки часов
+#define MIN_PIN 3             // пин кнопки настройки минут
+#define HUR_PIN 4             // пин кнопки настройки часов
 #define BRI_PIN A3            // фоторезистор
 #define auto_bright 1         // автоматическая подстройка яркости от уровня внешнего освещения (1 - включить, 0 - выключить)
 #define max_bright 50         // максимальная яркость (0 - 255)
