@@ -108,12 +108,10 @@ void BrightnessCheck() {
       new_bright = map(bright_r, 0, bright_constant, min_bright, max_bright);   // считать показания с фоторезистора, перевести диапазон
       new_bright = constrain(new_bright, min_bright, max_bright);
       new_bright_f = new_bright_f * coef + new_bright * (1 - coef);
-      if (new_bright_f = 0) {
       new_bright_f += 1;
-      }
       LEDS.setBrightness(new_bright_f);      // установить новую яркость
     }
-  }  
+  } 
 };
 
 // Convert time to array needet for display
