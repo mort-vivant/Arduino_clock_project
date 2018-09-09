@@ -14,9 +14,9 @@
 #define HUR_PIN 4             // пин кнопки настройки часов
 #define BRI_PIN A3            // фоторезистор
 #define auto_bright 1         // автоматическая подстройка яркости от уровня внешнего освещения (1 - включить, 0 - выключить)
-#define max_bright 50         // максимальная яркость (0 - 255)
-#define min_bright 1          // минимальная яркость (0 - 255)
-#define bright_constant 500   // константа усиления от внешнего света (0 - 1023), чем МЕНЬШЕ константа, тем "резче" будет прибавляться яркость
+#define max_bright 100        // максимальная яркость (0 - 255)
+#define min_bright 1         // минимальная яркость (0 - 255)
+#define bright_constant 1023   // константа усиления от внешнего света (0 - 1023), чем МЕНЬШЕ константа, тем "резче" будет прибавляться яркость
 #define coef 0.9              // коэффициент фильтра (0.0 - 1.0), чем больше - тем медленнее меняется яркость
 int new_bright, new_bright_f;
 unsigned long bright_timer, off_timer;
@@ -49,30 +49,29 @@ bool led_state = true;  // флаг состояния ленты
 int last_digit = 0;
 // int ledColor = 0x0000FF; // Color used (in hex)
 long ledColor = CRGB::DarkOrchid; // Color used (in hex)
-//long ledColor = CRGB::MediumVioletRed;
 //Random colors i picked up
 long ColorTable[16] = {
   CRGB::Amethyst,
   CRGB::Aqua,
-  CRGB::Blue,
-  CRGB::LawnGreen,
-  CRGB::MediumSeaGreen,
+  CRGB::BlueViolet,
+  CRGB::Crimson,
   CRGB::DarkMagenta,
-  CRGB::Coral,
   CRGB::DeepPink,
   CRGB::Fuchsia,
-  CRGB::Gold,
+  CRGB::Magenta,
+  CRGB::MidnightBlue,
+  CRGB::MediumVioletRed,
+  CRGB::Navy,
   CRGB::Indigo,
-  CRGB::LightCoral,
-  CRGB::Tomato,
-  CRGB::Salmon,
   CRGB::OrangeRed,
-  CRGB::Orchid
+  CRGB::Purple,
+  CRGB::RoyalBlue,
+  CRGB::Tomato
 };
 void setup() {
   Serial.begin(9600);
   LEDS.addLeds<WS2812B, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS); // Set LED strip type
-  LEDS.setBrightness(30); // Set initial brightness
+  LEDS.setBrightness(5); // Set initial brightness
   pinMode(DST_PIN, INPUT_PULLUP); // Define DST adjust button pin
   pinMode(MIN_PIN, INPUT_PULLUP); // Define Minutes adjust button pin
   pinMode(HUR_PIN, INPUT_PULLUP); // Define Hours adjust button pin
@@ -100,18 +99,21 @@ int GetTime() {
 
 // Check Light sensor and set brightness accordingly
 void BrightnessCheck() {
-
-  if (auto_bright) {                         // если включена адаптивная яркость
-    if (millis() - bright_timer > 100) {     // каждые 100 мс
-      bright_timer = millis();               // сброить таймер
-      new_bright = map(analogRead(BRI_PIN), 0, bright_constant, min_bright, max_bright);   // считать показания с фоторезистора, перевести диапазон
+  if (auto_bright) {
+    if (millis() - bright_timer > 1000) {     // каждые 100 мс
+      bright_timer = millis();
+      int bright = analogRead(BRI_PIN);        
+      int bright_r;
+      bright_r = bright%10 > 5 ? ((bright/10)*10)+10 : (bright/10)*10;
+      new_bright = map(bright_r, 0, bright_constant, min_bright, max_bright);   // считать показания с фоторезистора, перевести диапазон
       new_bright = constrain(new_bright, min_bright, max_bright);
       new_bright_f = new_bright_f * coef + new_bright * (1 - coef);
+      if (new_bright_f = 0) {
+      new_bright_f += 1;
+      }
       LEDS.setBrightness(new_bright_f);      // установить новую яркость
     }
-  }
-   if (!led_state) led_state = true;
-  off_timer = millis();  
+  }  
 };
 
 // Convert time to array needet for display
